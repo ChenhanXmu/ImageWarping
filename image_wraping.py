@@ -1,0 +1,62 @@
+import cv2
+import numpy as np
+import argparse
+
+def nothing(x):
+    pass
+
+def ParseArguments():
+    parser = argparse.ArgumentParser(description='Perspective Image Wrapping Example')
+    parser.add_argument('--img', action="store", dest="img", help='Image Path', required=True)
+    parser.add_argument('--Width', action="store", dest="Width", type=int, help='Target Image Width')
+    parser.add_argument('--Height', action="store", dest="Height", type=int, help='Target Image Height')
+    return parser.parse_args()
+if __name__ == "__main__":
+
+    args = ParseArguments()
+    org_img = cv2.imread(args.img)
+    w = org_img.shape[1] if args.Width is None else args.Width
+    h = org_img.shape[0] if args.Height is None else args.Height
+
+    img = cv2.resize(org_img,(w,h))
+    WIN_WRAP_TIITLE = 'Image Wrap'
+    WIN_RESIZED_WRAP_TIITLE = 'Resized Image Wrap'
+    LEFT_WRAP='left_wrap'
+    RIGHT_WRAP='right_wrap'
+    TOP_WRAP='top_wrap'
+    BOTTOM_WRAP='bottom_wrap'
+    cv2.namedWindow(WIN_WRAP_TIITLE)
+    Width, Height = img.shape[0:2]
+
+    cv2.createTrackbar(LEFT_WRAP,WIN_WRAP_TIITLE,0,100,nothing)
+    cv2.createTrackbar(RIGHT_WRAP,WIN_WRAP_TIITLE,0,100,nothing)
+    cv2.createTrackbar(TOP_WRAP,WIN_WRAP_TIITLE,0,100,nothing)
+    cv2.createTrackbar(BOTTOM_WRAP,WIN_WRAP_TIITLE,0,100,nothing)
+    rect = np.array([
+        [0, 0],
+        [Width - 1, 0],
+        [Width - 1, Height - 1],
+        [0, Height - 1]
+    ],dtype = "float32")
+
+    warped = np.copy(img)
+    while(1):
+        cv2.imshow(WIN_WRAP_TIITLE,warped)
+        k = cv2.waitKey(1) & 0xFF
+        if k == 27:
+            break
+        left_wrap_factor = int((cv2.getTrackbarPos(LEFT_WRAP, WIN_WRAP_TIITLE)/100.0)*Width)
+        right_wrap_factor = int((cv2.getTrackbarPos(RIGHT_WRAP, WIN_WRAP_TIITLE)/100.0)*Width)
+        top_wrap_factor = int((cv2.getTrackbarPos(TOP_WRAP, WIN_WRAP_TIITLE)/100.0)*Width)
+        bottom_wrap_factor = int((cv2.getTrackbarPos(BOTTOM_WRAP, WIN_WRAP_TIITLE)/100.0)*Width)
+
+        dst = np.array([
+            [top_wrap_factor + left_wrap_factor, top_wrap_factor],
+            [Width - (top_wrap_factor+right_wrap_factor+1), top_wrap_factor],
+            [Width - (bottom_wrap_factor+right_wrap_factor+1), Height - (bottom_wrap_factor+right_wrap_factor+1)],
+            [left_wrap_factor+bottom_wrap_factor, Height - (left_wrap_factor+bottom_wrap_factor+1)]
+        ],dtype = "float32")
+        # compute the perspective transform matrix and then apply it
+        M = cv2.getPerspectiveTransform(rect, dst)
+        warped = cv2.warpPerspective(img, M, (Height,Width))
+    cv2.destroyAllWindows()

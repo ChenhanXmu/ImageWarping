@@ -26,8 +26,7 @@ if __name__ == "__main__":
     TOP_WRAP='top_wrap'
     BOTTOM_WRAP='bottom_wrap'
     cv2.namedWindow(WIN_WRAP_TIITLE)
-    Width, Height = img.shape[0:2]
-
+    Height,Width  = img.shape[0:2]
     cv2.createTrackbar(LEFT_WRAP,WIN_WRAP_TIITLE,0,100,nothing)
     cv2.createTrackbar(RIGHT_WRAP,WIN_WRAP_TIITLE,0,100,nothing)
     cv2.createTrackbar(TOP_WRAP,WIN_WRAP_TIITLE,0,100,nothing)
@@ -45,10 +44,10 @@ if __name__ == "__main__":
         k = cv2.waitKey(1) & 0xFF
         if k == 27:
             break
-        left_wrap_factor = int((cv2.getTrackbarPos(LEFT_WRAP, WIN_WRAP_TIITLE)/100.0)*Width)
-        right_wrap_factor = int((cv2.getTrackbarPos(RIGHT_WRAP, WIN_WRAP_TIITLE)/100.0)*Width)
-        top_wrap_factor = int((cv2.getTrackbarPos(TOP_WRAP, WIN_WRAP_TIITLE)/100.0)*Width)
-        bottom_wrap_factor = int((cv2.getTrackbarPos(BOTTOM_WRAP, WIN_WRAP_TIITLE)/100.0)*Width)
+        left_wrap_factor = int((cv2.getTrackbarPos(LEFT_WRAP, WIN_WRAP_TIITLE)/100.0)*min(Width,Height))
+        right_wrap_factor = int((cv2.getTrackbarPos(RIGHT_WRAP, WIN_WRAP_TIITLE)/100.0)*min(Width,Height))
+        top_wrap_factor = int((cv2.getTrackbarPos(TOP_WRAP, WIN_WRAP_TIITLE)/100.0)*min(Width,Height))
+        bottom_wrap_factor = int((cv2.getTrackbarPos(BOTTOM_WRAP, WIN_WRAP_TIITLE)/100.0)*min(Width,Height))
 
         dst = np.array([
             [top_wrap_factor + left_wrap_factor, top_wrap_factor],
@@ -58,5 +57,7 @@ if __name__ == "__main__":
         ],dtype = "float32")
         # compute the perspective transform matrix and then apply it
         M = cv2.getPerspectiveTransform(rect, dst)
-        warped = cv2.warpPerspective(img, M, (Height,Width))
+        warped = cv2.warpPerspective(img, M, (Width,Height))
+        for i in range(4):
+            cv2.circle(warped,(dst[i,0],dst[i,1]),5,(0,255,0),-1)
     cv2.destroyAllWindows()

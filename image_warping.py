@@ -6,7 +6,7 @@ def nothing(x):
     pass
 
 def ParseArguments():
-    parser = argparse.ArgumentParser(description='Perspective Image Wrapping Example')
+    parser = argparse.ArgumentParser(description='Perspective Image Warping Example')
     parser.add_argument('--img', action="store", dest="img", help='Image Path', required=True)
     parser.add_argument('--Width', action="store", dest="Width", type=int, help='Target Image Width')
     parser.add_argument('--Height', action="store", dest="Height", type=int, help='Target Image Height')
@@ -19,12 +19,12 @@ if __name__ == "__main__":
     h = org_img.shape[0] if args.Height is None else args.Height
 
     img = cv2.resize(org_img,(w,h))
-    WIN_WRAP_TIITLE = 'Image Wrap'
-    WIN_RESIZED_WRAP_TIITLE = 'Resized Image Wrap'
-    LEFT_WRAP='left_wrap'
-    RIGHT_WRAP='right_wrap'
-    TOP_WRAP='top_wrap'
-    BOTTOM_WRAP='bottom_wrap'
+    WIN_WRAP_TIITLE = 'Image Warp'
+    WIN_RESIZED_WRAP_TIITLE = 'Resized Image Warp'
+    LEFT_WRAP='left_warp'
+    RIGHT_WRAP='right_warp'
+    TOP_WRAP='top_warp'
+    BOTTOM_WRAP='bottom_warp'
     cv2.namedWindow(WIN_WRAP_TIITLE)
     Height,Width  = img.shape[0:2]
     cv2.createTrackbar(LEFT_WRAP,WIN_WRAP_TIITLE,0,100,nothing)
